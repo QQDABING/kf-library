@@ -1,0 +1,361 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-parent</artifactId>
+        <version>Hoxton.SR10</version>
+    </parent>
+
+    <groupId>com.kf</groupId>
+    <artifactId>kf-library</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <description>kf-library是一个基于SpringBoot封装的基础库，内置丰富的JDK工具，自动装配了一系列的基础Bean与环境配置项，可用于快速构建SpringCloud项目，让微服务变得更简单。</description>
+
+    <modules>
+        <module>kf-library-common</module>
+        <module>kf-library-examples</module>
+        <module>kf-library-gateway</module>
+        <module>kf-library-modules</module>
+        <module>kf-library-modules-starters</module>
+        <module>kf-library-dependencies</module>
+        <module>kf-library-parent</module>
+    </modules>
+
+    <properties>
+        <kflibrary.version>1.2.101</kflibrary.version>
+        <java.version>11</java.version>
+        <is-snapshot>false</is-snapshot>
+        <revision-suffix></revision-suffix>
+        <revision>${kflibrary.version}_jdk${java.version}${revision-suffix}</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>KF Team Nexus Repository</name>
+            <url>http://nexus.kefen.site:7300/repository/maven-public/</url>
+        </repository>
+<!--        <repository>-->
+<!--            <id>maven2-repository.dev.java.net</id>-->
+<!--            <name>Java.net repository</name>-->
+<!--            <url>http://download.java.net/maven/2</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>osgeo</id>-->
+<!--            <name>Open Source Geospatial Foundation Repository</name>-->
+<!--            <url>http://download.osgeo.org/webdav/geotools/</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--            <id>boundless</id>-->
+<!--            <name>Boundless Maven Repository</name>-->
+<!--            <url>http://repo.boundlessgeo.com/main</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>jcenter-snapshots</id>-->
+<!--            <name>jcenter</name>-->
+<!--            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>-->
+<!--        </repository>-->
+
+<!--        <repository>-->
+<!--            <id>spring-snapshots</id>-->
+<!--            <name>Spring Snapshots</name>-->
+<!--            <url>https://repo.spring.io/snapshot</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>kf-snapshots</id>
+            <url>http://nexus.kefen.site:7300/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>kf-releases</id>
+            <url>http://nexus.kefen.site:7300/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Build-Jdk-Spec>${java.version}</Build-Jdk-Spec>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- 跳过单元测试-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <pomElements>
+                        <parent>expand</parent>
+                        <dependencyManagement>expand</dependencyManagement>
+                        <properties>interpolate</properties>
+                        <repositories>interpolate</repositories>
+                        <developers>interpolate</developers>
+                        <scm>interpolate</scm>
+                    </pomElements>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--检查是否存在未提交的代码(deploy时必须先把代码都提交了)-->
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                    <!-- 绑定validateRevision目标到install阶段 -->
+                    <execution>
+                        <id>validate-the-git-infos</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>validateRevision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--".git"文件路径, 默认值:${project.basedir}/.git; -->
+                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                    <!--构建过程中,是否打印详细信息;默认值:false;-->
+                    <verbose>false</verbose>
+                    <!--日期格式, 默认值:dd.MM.yyyy '@' HH:mm:ss z, 用于格式化"git.build.time"和"git.commit.time"-->
+                    <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+                    <!--跳过以pom方式打包的项目-->
+                    <skipPoms>false</skipPoms>
+                    <!--是否在多模块构建中只执行一次 -->
+                    <runOnlyOnce>true</runOnlyOnce>
+                    <!--属性的前缀，如生成的属性都是：git.xxx-->
+                    <prefix>git</prefix>
+                    <!--是否生成"git.properties"文件, 默认值:false;-->
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <!--指定"git.properties"文件的存放路径(相对于${project.basedir}的一个路径)-->
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <format>json</format>
+
+                    <!--git描述配置,可选;由JGit提供实现;-->
+                    <gitDescribe>
+                        <!--是否生成描述属性-->
+                        <skip>false</skip>
+                        <!--提交操作未发现tag时,仅打印提交操作ID,-->
+                        <always>false</always>
+                        <!--构建触发时,代码有修改时(即"dirty state"),添加指定后缀;默认值:"";-->
+                        <dirty>-dirty</dirty>
+                    </gitDescribe>
+                    <!-- 定义需要校验的属性 -->
+                    <validationProperties>
+                        <validationProperty>
+                            <!-- 校验失败时提示使用 -->
+                            <name>存在dirty代码（所有代码都commit了才能打包部署哈）</name>
+                            <!-- 需要校验的属性 -->
+                            <value>${git.dirty}</value>
+                            <!-- 期望的属性值：false -->
+                            <shouldMatchTo>false</shouldMatchTo>
+                        </validationProperty>
+                    </validationProperties>
+                    <!-- 配置校验的属性值与期望值不一致是否构建失败，默认值true：失败，false：继续构建 -->
+                    <validationShouldFailIfNoMatch>true</validationShouldFailIfNoMatch>
+                </configuration>
+            </plugin>
+
+            <!--deploy完成后,git打标签并push-->
+            <plugin>
+                <groupId>org.honton.chas</groupId>
+                <artifactId>git-tag-maven-plugin</artifactId>
+                <version>0.0.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${is-snapshot}</skip>
+                            <useUseDotSsh>false</useUseDotSsh>
+                            <tagName>${project.version}</tagName>
+                            <message>release ${project.version}</message>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
+
+
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>jdk11</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <java.version>11</java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk11-snapshot</id>
+            <properties>
+                <java.version>11</java.version>
+                <is-snapshot>true</is-snapshot>
+                <revision-suffix>-SNAPSHOT</revision-suffix>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk8</id>
+            <properties>
+                <java.version>8</java.version>
+            </properties>
+            <!--
+              使用独立于运行Maven的JDK的特定版本来构建项目
+              需要在~/.m2中增加一个toolchains.xml文件来配置不同版本jdk的安装位置
+          -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>toolchain</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <toolchains>
+                                <jdk>
+                                    <version>8</version>
+                                </jdk>
+                            </toolchains>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jdk8-snapshot</id>
+            <properties>
+                <java.version>8</java.version>
+                <is-snapshot>true</is-snapshot>
+                <revision-suffix>-SNAPSHOT</revision-suffix>
+            </properties>
+            <!--
+               使用独立于运行Maven的JDK的特定版本来构建项目
+               需要在~/.m2中增加一个toolchains.xml文件来配置不同版本jdk的安装位置
+           -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>toolchain</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <toolchains>
+                                <jdk>
+                                    <version>8</version>
+                                </jdk>
+                            </toolchains>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+        </profile>
+    </profiles>
+
+
+</project>
